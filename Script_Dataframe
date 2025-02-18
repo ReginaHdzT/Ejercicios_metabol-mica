@@ -1,6 +1,11 @@
 # Tarea Dataframe 
 #Creado por Regina Hernández 
 
+install.packages("knitr")
+install.packages("kableExtra")
+library("knitr")
+library("kableExtra")
+
 Motivo <- c("Falla sistema urinario", "Neoplasia", "Infeccioso", 
               "Trauma", "Falla sistema cardiovascular", "Muerte súbita", 
               "Cuerpo extraño") # Motivo de muerte
@@ -15,5 +20,17 @@ Tabla1 <- data.frame(Motivo_de_muerte = Motivo,
                      De_5_a_9_años = Edad2,
                      De_10_a_14_años = Edad3,
                      De_15_0_más = Edad4)
+Tabla1 %>%
+  kable("html", escape = FALSE) %>%
+  kable_styling("bordered", full_width = T) %>%
+  row_spec(0, color = "white", background = "#3CB371") %>%  
+  row_spec(1, color = "black", background = "#F0FFFF") %>% 
+  row_spec(2, color = "black", background = "#98FB98") %>%  
+  row_spec(3, color = "black", background = "#F0FFFF") %>%
+  row_spec(4, color = "black", background = "#98FB98") %>%  
+  row_spec(5, color = "black", background = "#F0FFFF") %>% 
+  row_spec(6, color = "black", background = "#98FB98") %>%  
+  row_spec(7, color = "black", background = "#F0FFFF")    
+
 View(Tabla1)
 head(Tabla1)
