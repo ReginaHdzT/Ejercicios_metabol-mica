@@ -1,0 +1,19 @@
+# Tarea Dataframe 
+#Creado por Regina Hernández 
+
+Motivo <- c("Falla sistema urinario", "Neoplasia", "Infeccioso", 
+              "Trauma", "Falla sistema cardiovascular", "Muerte súbita", 
+              "Cuerpo extraño") # Motivo de muerte
+
+Edad1 <- c(16,13,23,19,4,3,1) # 0 a 4 años
+Edad2 <- c(33,23,15,5,6,3,5) # 5 a 9 años
+Edad3 <- c(47,50,13,3,9,1,0) # 10 a 14 años
+Edad4 <- c(43,37,2,1,2,0,0) # 15 años o más
+
+Tabla1 <- data.frame(Motivo_de_muerte = Motivo,
+                     De_0_a_4_años = Edad1,
+                     De_5_a_9_años = Edad2,
+                     De_10_a_14_años = Edad3,
+                     De_15_0_más = Edad4)
+View(Tabla1)
+head(Tabla1)
