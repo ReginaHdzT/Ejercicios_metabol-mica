@@ -1,0 +1,110 @@
+---
+title: "MT_Clase 5"
+author: "Regina Hernández"
+date: "2025-02-26"
+output: html_document
+---
+
+---
+Instalar y correr la paquetería
+```{r}
+install.packages("pacman")
+library("pacman")
+p_load("readr", "dplyr", "ggplot2","ggrepel", "matrixTests")
+
+```
+
+Cargar la base de datos
+```{r}
+PCR <- read_csv(file = "https://raw.githubusercontent.com/ManuelLaraMVZ/Transcript-mica/main/datos_miRNAs.csv")
+
+head(PCR)
+
+```
+
+```{r}
+Genref <- PCR %>% 
+  filter(Condicion == "Control") %>% 
+  select(-2) 
+
+Genref
+
+```
+Selección de datos
+```{r}
+Genint <-  PCR %>% 
+  filter(Condicion == "Target") %>% 
+  select(-2)
+
+Genint
+```
+
+Correr los promedios de cada columna de los genes control
+```{r}
+meanCx1 <- mean(Genref$Cx1)
+meanCx2 <- mean(Genref$Cx2)
+meanCx3 <- mean(Genref$Cx3)
+meanT1 <- mean(Genref$T1)
+meanT2 <- mean(Genref$T2)
+meanT3 <- mean(Genref$T3)
+```
+
+Sacar el Delta Ct de cada columna de los genes de interés
+```{r}
+DCt <-  Genint %>%
+  mutate(DCT_CX1 = Cx1-meanCx1,
+         DCT_CX2 = Cx2-meanCx2,
+         DCT_CX3 = Cx3-meanCx3,
+         DCT_T1 = T1-meanT1,
+         DCT_T2 = T2-meanT2,
+         DCT_T3 = T3-meanT3) %>% 
+  select (-2,-3,-4,-5,-6,-7)
+```
+
+DosDeltaCT
+```{r}
+DosDCt <- DCt %>% 
+  mutate(A1 = 2^-(DCT_CX1),
+         A2 = 2^-(DCT_CX2),
+         A3 = 2^-(DCT_CX3),
+         B1 = 2^-(DCT_T1),
+         B2 = 2^-(DCT_T2),
+         B3 = 2^-(DCT_T3)) %>% 
+  select (-2:-7)
+DosDCt
+```
+Estadística para obtener los valores de p, hacemos t de Student
+```{r}
+Tstudent <-row_t_welch(DosDCt[,c("A1","A2","A3")],
+                       DosDCt[,c("B1","B2","B3")])
+Tstudent
+```
+
+Recuperar el valor de P para cada gen de la tabla anterior
+```{r}
+Pvalue <- DosDCt %>% 
+  mutate(PV = Tstudent$pvalue,
+         LPV = -log10(PV)) %>%
+  select(1,"PV", "LPV")
+Pvalue
+```
+
+Obtener el valor de Dos Delta Delta CT
+```{r}
+DosDDCT <- DosDCt %>% 
+  mutate(mean_DosDCT_CX = (A1 + A2 + A3) / 3,
+         mean_DosDCT_TX = (B1 + B2 + B3) / 3,
+         DosDDCT = mean_DosDCT_TX / mean_DosDCT_CX,
+         L2DDCT = log2(DosDDCT)) %>% #Para la gráfica necesito el log2 de 2DDCT
+  select (-2:-7)
+DosDDCT
+```
+Gráfica
+```{r}
+V_plot <- ggplot(mapping = aes(x= DosDDCT $ L2DDCT,
+                               y= Pvalue $LPV))+
+  geom_point()
+V_plot
+```
+
+
